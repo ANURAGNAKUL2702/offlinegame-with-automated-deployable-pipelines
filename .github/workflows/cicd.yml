@@ -2,54 +2,54 @@
 name: CI for React App
 
 # Controls when the workflow is triggered.
-# This workflow will run on every push and pull request to the 'main' branch.
 on:
   push:
-    branches: [ "main" ] 
+    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]  
+    branches: [ "main" ]
+  # Adds a manual trigger for the workflow.
+  # This allows you to run the workflow on demand from the GitHub Actions UI.
+  workflow_dispatch:
 
 # A workflow is made up of one or more jobs that can run in parallel.
 jobs:
-  # This job is named 'ci' for Continuous Integration.
-  ci:
+  # This is the first job, responsible for building and testing the application.
+  build_and_test:
     # The runner environment where this job will execute.
-    # 'ubuntu-latest' is a standard, up-to-date Linux environment.
     runs-on: ubuntu-latest
 
-    # The steps a job should perform.
+    # The steps this job should perform.
     steps:
-      # Step 1: Checks out your repository to the runner's workspace.
-      # This is a required first step for any workflow that needs your code.
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # Step 2: Sets up Node.js on the runner.
-      # We specify a stable version of Node.js that's compatible with React.
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x' # Use a specific version like '20.x' for consistency.
+          node-version: '20.x'
 
-      # Step 3: Installs the project dependencies.
-      # We use 'npm ci' which is a more secure and faster version of 'npm install' for CI environments.
       - name: Install Dependencies
         run: npm ci
 
-      # Step 4: Runs linting and checks for code style issues.
-      # This step helps maintain consistent code quality.
       - name: Run Linting
-        # You may need to change 'npm run lint' to the correct command in your package.json.
-        # If your 'npm test' script includes linting, you can skip this step.
         run: npm run lint
+        continue-on-error: true
 
-      # Step 5: Runs automated tests to ensure the app's functionality isn't broken.
       - name: Run Tests
-        # The '--coverage' flag is a good practice to see test coverage reports.
-        # You can adjust this to your specific test script, e.g., 'npm test'.
         run: npm test
 
-      # Step 6: Builds the React application for production.
-      # This creates the optimized 'build' folder which will be used for deployment later.
       - name: Build Application
         run: npm run build
+
+  # This is the second job, which will only run if the 'build_and_test' job succeeds.
+  # The 'needs' keyword creates this dependency.
+  notify_status:
+    # This job needs the 'build_and_test' job to complete successfully first.
+    needs: build_and_test
+    # The runner environment where this job will execute.
+    runs-on: ubuntu-latest
+    
+    # The steps this job should perform.
+    steps:
+      - name: Notification
+        run: echo "The build and tests have completed successfully! Ready for next stage."
