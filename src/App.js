@@ -50,7 +50,7 @@ const App = () => {
 
         {/* Deployment Info Card */}
         <div className="bg-slate-800/70 text-gray-100 p-6 rounded-2xl shadow-xl hover:shadow-2xl transition transform hover:scale-105 border border-slate-700 backdrop-blur-sm flex flex-col items-center text-center">
-          <h2 className="text-2xl font-bold mb-3 text-yellow-400">🚀 Deployment</h2>
+          <h2 className="text-2xl font-bold mb-3 text-yellow-400"> Deployment</h2>
           <p className="text-lg">Environment: <span className="font-semibold text-white">AWS EC2</span></p>
           <p className="text-lg">Last Deployed: <span className="font-semibold text-white">2 hours ago</span></p>
           <button className="mt-auto px-6 py-3 bg-green-600 text-white font-medium rounded-lg shadow-md hover:bg-green-700 transition transform hover:translate-y-0.5">
