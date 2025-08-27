@@ -1,10 +1,10 @@
-
 name: CD React App
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:    # Manual trigger support
 
 jobs:
   deploy:
@@ -33,9 +33,10 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            rm -rf ${{ secrets.APP_PATH }}/build
-            mkdir -p ${{ secrets.APP_PATH }}/build
-            # Copy files from GitHub runner to EC2
+            # Remove old build folder
+            sudo rm -rf ${{ secrets.APP_PATH }}/build
+            sudo mkdir -p ${{ secrets.APP_PATH }}/build
+            # Copy build files
             rsync -avz --delete ./build/ ${{ secrets.APP_PATH }}/build/
             # Fix permissions
             sudo chown -R www-data:www-data ${{ secrets.APP_PATH }}/build
