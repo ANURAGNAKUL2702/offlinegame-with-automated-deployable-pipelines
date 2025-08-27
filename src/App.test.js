@@ -6,9 +6,9 @@ test('renders CloudSniper DevOps Dashboard title', () => {
   // Renders the App component into a virtual DOM.
   render(<App />);
   
-  // Uses screen.getByText() to find the "CloudSniper" text.
-  // The 'i' flag makes the search case-insensitive.
-  const titleElement = screen.getByText(/CloudSniper/i);
+  // Uses screen.getByRole to find the h1 element with the name "CloudSniper".
+  // This is a more robust way to select a specific element when text might be repeated.
+  const titleElement = screen.getByRole('heading', { name: /CloudSniper/i, level: 1 });
   
   // Asserts that the element was found and is in the document.
   expect(titleElement).toBeInTheDocument();
