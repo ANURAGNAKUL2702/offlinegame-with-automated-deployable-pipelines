@@ -5,7 +5,7 @@ name: CI for React App
 # This workflow will run on every push and pull request to the 'main' branch.
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main" ] 
   pull_request:
     branches: [ "main" ]  
 
