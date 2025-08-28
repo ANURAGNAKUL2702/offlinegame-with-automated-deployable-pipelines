@@ -44,9 +44,9 @@ jobs:
       - name: Build Application
         run: npm run build
 
-      # Upload build folder as artifact
+      # Upload build folder as artifact (v4)
       - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: react-build
           path: build/
