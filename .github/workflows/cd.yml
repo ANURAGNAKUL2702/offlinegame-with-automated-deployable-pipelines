@@ -20,9 +20,7 @@ jobs:
         with:
           node-version: 20
 
-      # ---------------------------
-      # Caching step
-      # ---------------------------
+     
       - name: Cache Node.js modules
         uses: actions/cache@v3
         with:
@@ -77,9 +75,9 @@ jobs:
 
   notify_status:
     name: Send Email Notification
-    needs: [deploy]     # ✅ runs only after deploy finishes
+    needs: [deploy]     
     runs-on: ubuntu-latest
-    if: always()        # ✅ runs even if deploy fails
+    if: always()       
     steps:
       - name: Send Email
         uses: dawidd6/action-send-mail@v3
