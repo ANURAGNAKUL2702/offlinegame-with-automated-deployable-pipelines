@@ -56,5 +56,23 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Notification
-        run: echo "The build and tests have completed successfully! Ready for next stage."
+      - name: Send Email Notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "✅ CI Pipeline Completed"
+          to: "your-email@example.com"
+          from: "GitHub Actions <${{ secrets.EMAIL_USERNAME }}>"
+          body: |
+            Hello 👋
+
+            The CI workflow for your React app has completed successfully.
+            - Repo: ${{ github.repository }}
+            - Branch: ${{ github.ref }}
+            - Run ID: ${{ github.run_id }}
+
+            ✅ Build and Tests passed. Artifacts are uploaded.
+
