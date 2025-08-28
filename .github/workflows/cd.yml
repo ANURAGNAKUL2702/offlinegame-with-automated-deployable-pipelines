@@ -1,25 +1,43 @@
 name: CD React App
 
 on:
-  workflow_run:
-    workflows: ["CI for React App"]
-    types: 
-      - completed
+  push:
     branches:
       - main
   workflow_dispatch:
 
 jobs:
   deploy:
-    name: Deploy to EC2
+    name: Build & Deploy to EC2
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download build artifact from CI
-        uses: actions/download-artifact@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          name: react-build
-          path: build/
+          node-version: 20
+
+      # ---------------------------
+      # Caching step
+      # ---------------------------
+      - name: Cache Node.js modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build React app
+        run: npm run build
 
       - name: Prepare EC2 for deployment
         uses: appleboy/ssh-action@v0.1.9
