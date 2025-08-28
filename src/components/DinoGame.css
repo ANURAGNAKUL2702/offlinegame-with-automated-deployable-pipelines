@@ -1,0 +1,16 @@
+canvas {
+  border: 2px solid #000;
+  background: #fff;
+}
+.exit-button {
+  background: linear-gradient(135deg, #1dd1a1, #10ac84);
+  padding: 10px 25px;
+  border-radius: 15px;
+  font-size: 16px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 5px 20px rgba(16, 172, 132, 0.4);
+  margin-bottom: 20px;
+}
