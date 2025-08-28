@@ -1,7 +1,10 @@
 name: CD React App
 
 on:
-  push:
+  workflow_run:
+    workflows: [ci.yml]
+    types: 
+      - completed
     branches:
       - main
   workflow_dispatch:
