@@ -60,7 +60,7 @@ const App = () => {
 
         {/* Alerts/Notifications Card */}
         <div className="bg-slate-800/70 text-gray-100 p-6 rounded-2xl shadow-xl hover:shadow-2xl transition transform hover:scale-105 border border-slate-700 backdrop-blur-sm flex flex-col items-center">
-          <h2 className="text-2xl font-bold mb-3 text-red-400">⚡ Alerts</h2>
+          <h2 className="text-2xl font-bold mb-3 text-red-400"> Alerts</h2>
           <ul className="space-y-2 text-left w-full mt-4">
             <li className="flex items-center space-x-2">
               <span className="text-green-500">✔</span>
