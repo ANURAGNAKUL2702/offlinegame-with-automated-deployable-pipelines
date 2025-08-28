@@ -26,16 +26,44 @@ jobs:
       - name: Build React app
         run: npm run build
 
-      - name: Deploy to EC2
+      - name: Prepare EC2 for deployment
+        uses: appleboy/ssh-action@v0.1.9
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            echo "🔄 Preparing deployment directory..."
+            # Create temp directory with ubuntu ownership
+            sudo mkdir -p /tmp/app-build
+            sudo chown -R ubuntu:ubuntu /tmp/app-build
+            echo "✅ Ready for file transfer..."
+
+      - name: Copy build files to EC2
         uses: easingthemes/ssh-deploy@v4.1.8
         with:
           SSH_PRIVATE_KEY: ${{ secrets.EC2_KEY }}
           REMOTE_HOST: ${{ secrets.EC2_HOST }}
           REMOTE_USER: ${{ secrets.EC2_USER }}
           SOURCE: "build/"
-          TARGET: ${{ secrets.APP_PATH }}/
-          SCRIPT_AFTER: |
+          TARGET: "/tmp/app-build/"
+
+      - name: Finalize deployment
+        uses: appleboy/ssh-action@v0.1.9
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            echo "🚀 Finalizing deployment..."
+            # Remove old build and move new one
+            sudo rm -rf ${{ secrets.APP_PATH }}/build
+            sudo mv /tmp/app-build ${{ secrets.APP_PATH }}/build
+            
+            # Set correct permissions for Nginx
             sudo chown -R www-data:www-data ${{ secrets.APP_PATH }}/build
             sudo chmod -R 755 ${{ secrets.APP_PATH }}/build
+            
+            # Restart Nginx
             sudo systemctl restart nginx
-            echo "✅ Deployment successful! 🚀"
+            echo "✅ Deployment successful! Your app is live! 🎉"
