@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:  # Manual trigger support
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -12,72 +12,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout the repo
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2️⃣ Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 20
 
-      # 3️⃣ Install dependencies
       - name: Install dependencies
         run: npm install
 
-      # 4️⃣ Build React app
       - name: Build React app
         run: npm run build
 
-      # 5️⃣ Deploy to EC2 (combined copy and setup)
       - name: Deploy to EC2
-        uses: appleboy/ssh-action@v0.1.9
+        uses: easingthemes/ssh-deploy@v4.1.8
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          port: 22
-          script: |
-            echo "✅ Starting deployment..."
-            
-            # Ensure APP_PATH exists
-            sudo mkdir -p ${{ secrets.APP_PATH }}
-            
-            # Remove old build folder safely
-            if [ -d "${{ secrets.APP_PATH }}/build" ]; then
-              sudo rm -rf ${{ secrets.APP_PATH }}/build
-            fi
-            
-            # Create new build folder
-            sudo mkdir -p ${{ secrets.APP_PATH }}/build
-            echo "✅ Ready for file transfer..."
-            
-            # Exit to allow file copy
-            exit 0
-
-      # 6️⃣ Copy build files using rsync through SSH
-      - name: Copy build files via SSH
-        run: |
-          echo "${{ secrets.EC2_KEY }}" > private_key
-          chmod 600 private_key
-          rsync -avz -e "ssh -i private_key -o StrictHostKeyChecking=no" build/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:${{ secrets.APP_PATH }}/build/
-
-      # 7️⃣ Final setup and restart
-      - name: Final setup and restart Nginx
-        uses: appleboy/ssh-action@v0.1.9
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          port: 22
-          script: |
-            echo "✅ Setting up permissions..."
-            
-            # Fix ownership and permissions
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_KEY }}
+          REMOTE_HOST: ${{ secrets.EC2_HOST }}
+          REMOTE_USER: ${{ secrets.EC2_USER }}
+          SOURCE: "build/"
+          TARGET: ${{ secrets.APP_PATH }}/
+          SCRIPT_AFTER: |
             sudo chown -R www-data:www-data ${{ secrets.APP_PATH }}/build
             sudo chmod -R 755 ${{ secrets.APP_PATH }}/build
-            
-            # Restart Nginx to apply changes
             sudo systemctl restart nginx
-            echo "✅ Deployment finished successfully!"
+            echo "✅ Deployment successful! 🚀"
