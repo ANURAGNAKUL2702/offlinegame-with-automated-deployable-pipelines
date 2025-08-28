@@ -20,7 +20,7 @@ function App() {
         </button>
       </header>
     </div>
-  );
+  ); 
 }
 
 export default App;
