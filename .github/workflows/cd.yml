@@ -20,6 +20,19 @@ jobs:
         with:
           node-version: 20
 
+      # ---------------------------
+      # Caching step
+      # ---------------------------
+      - name: Cache Node.js modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
       - name: Install dependencies
         run: npm install
 
@@ -34,7 +47,6 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           script: |
             echo "🔄 Preparing deployment directory..."
-            # Create temp directory with ubuntu ownership
             sudo mkdir -p /tmp/app-build
             sudo chown -R ubuntu:ubuntu /tmp/app-build
             echo "✅ Ready for file transfer..."
@@ -56,14 +68,9 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           script: |
             echo "🚀 Finalizing deployment..."
-            # Remove old build and move new one
             sudo rm -rf ${{ secrets.APP_PATH }}/build
             sudo mv /tmp/app-build ${{ secrets.APP_PATH }}/build
-            
-            # Set correct permissions for Nginx
             sudo chown -R www-data:www-data ${{ secrets.APP_PATH }}/build
             sudo chmod -R 755 ${{ secrets.APP_PATH }}/build
-            
-            # Restart Nginx
             sudo systemctl restart nginx
             echo "✅ Deployment successful! Your app is live! 🎉"
