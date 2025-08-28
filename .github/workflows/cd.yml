@@ -2,7 +2,7 @@ name: CD React App
 
 on:
   workflow_run:
-    workflows: [ci.yml]
+    workflows: ["CI for React App"]
     types: 
       - completed
     branches:
