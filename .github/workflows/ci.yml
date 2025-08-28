@@ -54,23 +54,27 @@ jobs:
   notify_status:
     needs: build_and_test
     runs-on: ubuntu-latest
-
+    if: always()   # <-- runs even if build fails
     steps:
       - name: Send Email Notification
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
-          server_port: 587   # ✅ use 587 with STARTTLS (recommended)
+          server_port: 465       # ✅ Correct for Gmail SSL
           secure: true
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "✅ CI Pipeline Completed"
+          subject: |
+            🚀 CI Pipeline [${{ job.status }}] - ${{ github.repository }}
           to: "your-email@gmail.com"
           from: "GitHub Actions <${{ secrets.EMAIL_USERNAME }}>"
           body: |
             Hello 👋
-            The CI workflow for your React app has completed successfully.
-            - Repo: ${{ github.repository }}
-            - Branch: ${{ github.ref }}
-            - Run ID: ${{ github.run_id }}
-            ✅ Build and Tests passed. Artifacts are uploaded.
+            The CI workflow for your React app has finished.
+
+            🔹 Repo: ${{ github.repository }}
+            🔹 Branch: ${{ github.ref }}
+            🔹 Run ID: ${{ github.run_id }}
+
+            📌 Status: ${{ job.status }}
+            ✅ Passed steps will upload build artifacts.
