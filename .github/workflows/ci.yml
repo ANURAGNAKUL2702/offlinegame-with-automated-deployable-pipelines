@@ -3,7 +3,7 @@ name: CI for React App
 
 # Controls when the workflow is triggered.
 on:
-  push:
+  push: 
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
