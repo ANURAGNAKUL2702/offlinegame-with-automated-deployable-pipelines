@@ -7,7 +7,7 @@ on:
   workflow_dispatch:    # Manual trigger support
 
 jobs:
-  deploy:
+  deploy: 
     name: Build & Deploy to EC2
     runs-on: ubuntu-latest
 
