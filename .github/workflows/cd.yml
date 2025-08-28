@@ -34,7 +34,7 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build React app
         run: npm run build
@@ -74,3 +74,33 @@ jobs:
             sudo chmod -R 755 ${{ secrets.APP_PATH }}/build
             sudo systemctl restart nginx
             echo "✅ Deployment successful! Your app is live! 🎉"
+
+  notify_status:
+    name: Send Email Notification
+    needs: [deploy]     # ✅ runs only after deploy finishes
+    runs-on: ubuntu-latest
+    if: always()        # ✅ runs even if deploy fails
+    steps:
+      - name: Send Email
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465   # Gmail SSL
+          secure: true
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: |
+            📦 CD Pipeline [${{ job.status }}] - ${{ github.repository }}
+          to: "your-email@gmail.com"
+          from: "GitHub Actions <${{ secrets.EMAIL_USERNAME }}>"
+          body: |
+            Hello 👋
+            The CD workflow for your React app has finished.
+
+            🔹 Repo: ${{ github.repository }}
+            🔹 Branch: ${{ github.ref }}
+            🔹 Run ID: ${{ github.run_id }}
+
+            📌 Status: ${{ job.status }}
+            ✅ If successful → App is deployed to EC2.
+            ❌ If failed → Check Actions logs for details.
