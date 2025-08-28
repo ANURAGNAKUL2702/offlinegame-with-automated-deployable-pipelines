@@ -44,6 +44,13 @@ jobs:
       - name: Build Application
         run: npm run build
 
+      # Upload build folder as artifact
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: react-build
+          path: build/
+
   notify_status:
     needs: build_and_test
     runs-on: ubuntu-latest
