@@ -1,45 +1,59 @@
 name: CD React App
- 
+
 on:
   push:
     branches:
       - main
-  workflow_dispatch:    # Manual trigger support
+  workflow_dispatch:  # Manual trigger support
 
 jobs:
-  deploy: 
+  deploy:
     name: Build & Deploy to EC2
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      # 1️⃣ Checkout the repo
+      - name: Checkout repository
         uses: actions/checkout@v3
 
+      # 2️⃣ Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 20
 
+      # 3️⃣ Install dependencies
       - name: Install dependencies
         run: npm install
 
+      # 4️⃣ Build React app
       - name: Build React app
         run: npm run build
 
+      # 5️⃣ Deploy to EC2 via SSH
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v0.1.9
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
+          port: 22
+          debug: true               # Shows detailed logs
           script: |
-            # Remove old build folder
-            sudo rm -rf ${{ secrets.APP_PATH }}/build
+            echo "✅ Starting deployment..."
+            # Ensure APP_PATH exists
+            sudo mkdir -p ${{ secrets.APP_PATH }}
+            # Remove old build folder safely
+            if [ -d "${{ secrets.APP_PATH }}/build" ]; then
+              sudo rm -rf ${{ secrets.APP_PATH }}/build
+            fi
+            # Create new build folder
             sudo mkdir -p ${{ secrets.APP_PATH }}/build
-            # Copy build files
+            # Copy build files from runner to EC2
             rsync -avz --delete ./build/ ${{ secrets.APP_PATH }}/build/
-            # Fix permissions
+            # Fix ownership and permissions
             sudo chown -R www-data:www-data ${{ secrets.APP_PATH }}/build
             sudo chmod -R 755 ${{ secrets.APP_PATH }}/build
-            # Restart Nginx
+            # Restart Nginx to apply changes
             sudo systemctl restart nginx
+            echo "✅ Deployment finished successfully!"
