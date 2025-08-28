@@ -16,7 +16,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: react-build
-          path: build
+          path: build/
 
       - name: Prepare EC2 for deployment
         uses: appleboy/ssh-action@v0.1.9
