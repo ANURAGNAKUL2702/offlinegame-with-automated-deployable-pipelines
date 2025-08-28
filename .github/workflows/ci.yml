@@ -1,24 +1,16 @@
-# The name of your workflow, which will appear in the GitHub Actions tab.
 name: CI for React App
 
-# Controls when the workflow is triggered.
 on:
   push: 
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-  # Adds a manual trigger for the workflow.
-  # This allows you to run the workflow on demand from the GitHub Actions UI.
   workflow_dispatch:
 
-# A workflow is made up of one or more jobs that can run in parallel.
 jobs:
-  # This is the first job, responsible for building and testing the application.
   build_and_test:
-    # The runner environment where this job will execute.
     runs-on: ubuntu-latest
 
-    # The steps this job should perform.
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -36,20 +28,15 @@ jobs:
         continue-on-error: true
 
       - name: Run Tests
-        run: npm test
+        run: npm test -- --ci --coverage --watchAll=false  # ← Complete test command
 
       - name: Build Application
         run: npm run build
 
-  # This is the second job, which will only run if the 'build_and_test' job succeeds.
-  # The 'needs' keyword creates this dependency.
   notify_status:
-    # This job needs the 'build_and_test' job to complete successfully first.
     needs: build_and_test
-    # The runner environment where this job will execute.
     runs-on: ubuntu-latest
     
-    # The steps this job should perform.
     steps:
       - name: Notification
         run: echo "The build and tests have completed successfully! Ready for next stage."
