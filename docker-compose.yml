@@ -1,0 +1,24 @@
+
+
+services:
+  offlinegame:
+    image: offlinegame:latest
+    container_name: offlinegame-container
+    ports:
+      - "8080:80"
+    volumes:
+      - offlinegame_data:/usr/share/nginx/html/data
+    networks:
+      - offlinegame_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-container
+    networks:
+      - offlinegame_network
+
+volumes:
+  offlinegame_data:
+
+networks:
+  offlinegame_network:
