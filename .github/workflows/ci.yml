@@ -67,6 +67,7 @@ jobs:
         run: |
           docker tag my-react-app:${{ github.sha }} ${{ secrets.DOCKER_USERNAME }}/my-react-app:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/my-react-app:latest
+          
 
       # Step 11: Upload build artifacts
       - name: Upload Build Artifacts
